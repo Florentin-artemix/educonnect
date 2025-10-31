@@ -14,17 +14,30 @@ import java.util.Optional;
 @Repository
 public interface PaiementRepository extends JpaRepository<Paiement, Long> {
     
+    // Rechercher les paiements par élève
     List<Paiement> findByEleve(Eleve eleve);
     
     List<Paiement> findByEleveId(Long eleveId);
     
-    List<Paiement> findByTrimestre(Paiement.Trimestre trimestre);
+    // Rechercher les paiements par motif
+    List<Paiement> findByMotifPaiementId(Long motifPaiementId);
     
-    Optional<Paiement> findByEleveIdAndTrimestre(Long eleveId, Paiement.Trimestre trimestre);
+    // Rechercher les paiements d'un élève pour un motif spécifique
+    List<Paiement> findByEleveIdAndMotifPaiementId(Long eleveId, Long motifPaiementId);
     
+    // Rechercher les paiements d'une classe
     @Query("SELECT p FROM Paiement p WHERE p.eleve.classe.id = :classeId")
     List<Paiement> findByClasseId(@Param("classeId") Long classeId);
     
-    @Query("SELECT SUM(p.montantPaye) FROM Paiement p WHERE p.eleve.id = :eleveId")
+    // Calculer le total versé par un élève (tous motifs confondus)
+    @Query("SELECT SUM(p.montantVerse) FROM Paiement p WHERE p.eleve.id = :eleveId")
     BigDecimal getTotalPaiementsByEleveId(@Param("eleveId") Long eleveId);
+    
+    // Calculer le total versé par un élève pour un motif spécifique
+    @Query("SELECT SUM(p.montantVerse) FROM Paiement p WHERE p.eleve.id = :eleveId AND p.motifPaiement.id = :motifPaiementId")
+    BigDecimal getTotalPaiementsByEleveIdAndMotifId(@Param("eleveId") Long eleveId, @Param("motifPaiementId") Long motifPaiementId);
+    
+    // Obtenir l'historique des paiements d'un élève pour un motif (trié par date décroissante)
+    @Query("SELECT p FROM Paiement p WHERE p.eleve.id = :eleveId AND p.motifPaiement.id = :motifPaiementId ORDER BY p.datePaiement DESC")
+    List<Paiement> getHistoriquePaiements(@Param("eleveId") Long eleveId, @Param("motifPaiementId") Long motifPaiementId);
 }

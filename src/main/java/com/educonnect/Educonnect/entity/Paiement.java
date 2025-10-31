@@ -20,30 +20,21 @@ public class Paiement {
     private Long id;
     
     @ManyToOne
-    @JoinColumn(name = "eleve_id")
+    @JoinColumn(name = "eleve_id", nullable = false)
     private Eleve eleve;
     
-    @Column(name = "montant_total", precision = 10, scale = 2)
-    private BigDecimal montantTotal;
+    @ManyToOne
+    @JoinColumn(name = "motif_paiement_id", nullable = false)
+    private MotifPaiement motifPaiement;
     
-    @Column(name = "montant_paye", precision = 10, scale = 2)
-    private BigDecimal montantPaye;
+    @Column(name = "montant_verse", precision = 10, scale = 2, nullable = false)
+    private BigDecimal montantVerse;
     
-    @Enumerated(EnumType.STRING)
-    private Trimestre trimestre;
-    
-    @Column(name = "date_maj")
-    private LocalDateTime dateMaj;
+    @Column(name = "date_paiement")
+    private LocalDateTime datePaiement;
     
     @PrePersist
-    @PreUpdate
-    protected void onUpdate() {
-        dateMaj = LocalDateTime.now();
-    }
-    
-    public enum Trimestre {
-        TRIMESTRE_1,
-        TRIMESTRE_2,
-        TRIMESTRE_3
+    protected void onCreate() {
+        datePaiement = LocalDateTime.now();
     }
 }
